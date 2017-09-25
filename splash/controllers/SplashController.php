@@ -4,6 +4,14 @@ namespace Craft;
 
 class SplashController extends BaseController {
 
+	// Variables
+	// =========================================================================
+
+	private $_settings;
+
+	// Actions
+	// =========================================================================
+
 	public function actionIndex ()
 	{
 		craft()->templates->includeCssResource("splash/css/splash.css");
@@ -79,15 +87,85 @@ class SplashController extends BaseController {
 
 	public function actionDl ()
 	{
+		$this->getSettings();
 		$this->requireAjaxRequest();
 		$this->requirePostRequest();
 
+		$id = craft()->request->getRequiredPost("id");
 		$image = craft()->request->getRequiredPost("image");
 		$author = craft()->request->getRequiredPost("author");
 		$authorUrl = craft()->request->getRequiredPost("authorUrl");
 		$color = craft()->request->getRequiredPost("color");
 
-		$this->returnErrorJson("NOPE");
+		$sourceId = $this->_settings["source"];
+		$authorField = $this->_settings["authorField"];
+		$authorUrlField = $this->_settings["authorUrlField"];
+		$colorField = $this->_settings["colorField"];
+
+		if (!$sourceId) {
+			$this->returnErrorJson("Missing Upload source (see plugin settings).");
+		}
+
+		$folderId = craft()->assets->getRootFolderBySourceId($sourceId)->id;
+		$fileName = $id . ".jpg";
+		$tempPath = craft()->path->getTempUploadsPath();
+		$tempLocation = $tempPath . $fileName;
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $image);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$image = curl_exec($ch);
+		curl_close($ch);
+
+		file_put_contents($tempLocation, $image);
+		$asset = craft()->assets->insertFileByLocalPath(
+			$tempLocation,
+			$fileName,
+			$folderId,
+			AssetConflictResolution::Replace
+		);
+
+		if ($asset->hasErrors()) {
+			$this->removeTemp($tempLocation);
+			$this->returnJson([
+				"errors" => $asset->getErrors(),
+			]);
+		}
+
+		$asset = craft()->assets->getFileById($asset->getDataItem('fileId'));
+
+		$content = [];
+
+		if ($authorField) $content[$authorField] = $author;
+		if ($authorUrlField) $content[$authorUrlField] = $authorUrl;
+		if ($colorField) $content[$colorField] = $color;
+
+		$asset->setContentFromPost($content);
+
+		if (craft()->assets->storeFile($asset)) {
+			$this->removeTemp($tempLocation);
+			$this->returnJson(["success" => true]);
+		} else {
+			$this->removeTemp($tempLocation);
+			$this->returnJson([
+				"errors" => $asset->getErrors(),
+			]);
+		}
+	}
+
+	// Helpers
+	// =========================================================================
+
+	private function getSettings ()
+	{
+		$this->_settings = craft()->plugins->getPlugin("splash")->getSettings();
+	}
+
+	private function removeTemp ($tempFile)
+	{
+		if (file_exists($tempFile)) unlink($tempFile);
 	}
 
 }

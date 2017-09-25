@@ -38,7 +38,7 @@
 		id:           "colorField",
 		name:         "colorField",
 		label:        "Image primary color field",
-		instructions: "Store the primary color of the image.",
+		instructions: "Store the primary color of the image. <i>Why not do more with color using <a href='https://github.com/ethercreative/colormixer' target='_blank'>Color Mixer</a>!</i>",
 		value:        settings.colorField,
 		options:      [],
 	}) }}
@@ -54,6 +54,10 @@
 			, authorUrlField = document.getElementById(ns("authorUrlField"))
 			, colorField     = document.getElementById(ns("colorField"));
 
+		const authorFieldValue    = "{{ settings.authorField }}"
+			, authorUrlFieldValue = "{{ settings.authorUrlField }}"
+			, colorFieldValue     = "{{ settings.colorField }}";
+
 		function SplashSettings () {
 			source.addEventListener("change", SplashSettings.OnChange);
 			SplashSettings.OnChange();
@@ -61,7 +65,7 @@
 
 		SplashSettings.OnChange = function () {
 			for (let i = 0; i < sources.length; i++) {
-				if (sources[i].handle === source.value) {
+				if (sources[i].value === source.value) {
 					SplashSettings.UpdateSelectedSource(sources[i]);
 					return;
 				}
@@ -82,22 +86,26 @@
 			opt.setAttribute("value", "");
 			opt.textContent = "-----";
 
-			authorField.appendChild(opt);
-			authorUrlField.appendChild(opt);
-			colorField.appendChild(opt);
+			authorField.appendChild(opt.cloneNode(true));
+			authorUrlField.appendChild(opt.cloneNode(true));
+			colorField.appendChild(opt.cloneNode(true));
 
 			source.fields.forEach(function (field) {
 				const opt = document.createElement("option");
 				opt.setAttribute("value", field.value);
 				opt.textContent = field.label;
 
-				if (["PlainText", "RichText"].indexOf(field.type) > -1) {
-					authorField.appendChild(opt);
-					authorUrlField.appendChild(opt);
+				if (field.type === "Color") {
+					colorField.appendChild(opt.cloneNode(true));
 				} else {
-					colorField.appendChild(opt);
+					authorField.appendChild(opt.cloneNode(true));
+					authorUrlField.appendChild(opt.cloneNode(true));
 				}
 			});
+
+			authorField.value = authorFieldValue;
+			authorUrlField.value = authorUrlFieldValue;
+			colorField.value = colorFieldValue;
 		};
 
 		SplashSettings();

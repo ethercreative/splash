@@ -48,6 +48,9 @@ class Splash { // eslint-disable-line no-unused-vars
 		);
 		
 		this.query(true);
+		
+		this.preview = t("div", { class: "splash--preview" });
+		document.body.appendChild(this.preview);
 	}
 	
 	// Actions
@@ -137,6 +140,23 @@ class Splash { // eslint-disable-line no-unused-vars
 				);
 	}
 	
+	showPreview (image) {
+		while (this.preview.firstElementChild)
+			this.preview.removeChild(this.preview.firstElementChild);
+		
+		this.preview.appendChild(
+			this.render(image, () => {
+				this.preview.classList.remove("open");
+				document.body.style.overflow = "";
+				document.body.parentNode.style.overflow = "";
+			}),
+		);
+		
+		this.preview.classList.add("open");
+		document.body.style.overflow = "hidden";
+		document.body.parentNode.style.overflow = "hidden";
+	}
+	
 	// Events
 	// =========================================================================
 	
@@ -147,7 +167,7 @@ class Splash { // eslint-disable-line no-unused-vars
 	
 	onLoad = e => {
 		e.target.removeEventListener("load", this.onLoad);
-		e.target.parentNode.classList.add("loaded");
+		e.target.parentNode.parentNode.classList.add("loaded");
 		e.target.style.paddingTop = "0";
 	};
 	
@@ -167,20 +187,27 @@ class Splash { // eslint-disable-line no-unused-vars
 		});
 	};
 	
-	onDownload = e => {
+	onDownload = (e, target = null) => {
 		e.preventDefault();
-		const target = e.target;
-		const { image, author, authorUrl, color } = target.dataset;
+		target = target ? target : e.target;
+		const { id, image, author, authorUrl, color } = target.dataset;
 		
-		target.classList.add("downloading");
+		let parent = target;
+		while (!parent.classList.contains("splash--grid-image"))
+			parent = parent.parentNode;
+		
+		parent.classList.add("downloading");
 		
 		Craft.postActionRequest("splash/dl", {
-			image, author, authorUrl, color
+			id, image, author, authorUrl, color
 		}, (res, status) => {
-			target.classList.remove("downloading");
+			parent.classList.remove("downloading");
 			
 			if (status !== "success" || res.hasOwnProperty("error")) {
-				Craft.cp.displayError("Failed to download image.");
+				Craft.cp.displayError(
+					res.hasOwnProperty("error")
+						? res.error : "Failed to download image."
+				);
 				return;
 			}
 			
@@ -231,17 +258,23 @@ class Splash { // eslint-disable-line no-unused-vars
 		inViewport(target) && this.loadNextImage(target);
 	}
 	
-	render ({ urls, user, width, height, links, color }) {
+	render (
+		{ id, urls, user, width, height, links, color },
+		onClick = null
+	) {
 		let padTop = 75;
 		if (width && height) {
 			padTop = (height / width) * 100;
 		}
 		
+		const isPreview = onClick !== null;
+		if (!onClick) onClick = this.showPreview.bind(this, arguments[0]);
+		
 		const refer = "?utm_source=Splash_For_Craft_CMS&utm_medium=referral&utm_campaign=api-credit";
 		
 		return t("div", {
-			class: "splash--grid-image",
-			style: `
+			class: "splash--grid-image" + (isPreview ? " loaded" : ""),
+			style: isPreview ? "" : `
 				padding-top: ${padTop}%;
 			`,
 		}, [
@@ -251,21 +284,43 @@ class Splash { // eslint-disable-line no-unused-vars
 					target: "_blank",
 				}, user.name),
 				t("a", {
+					id: (isPreview ? "" : id),
 					class: "dl",
 					href: links.download + refer,
 					target: "_blank",
+					"data-id": id,
 					"data-image": links.download,
 					"data-author": user.name,
 					"data-author-url": user.links.html,
 					"data-color": color,
-					click: this.onDownload,
+					click: isPreview ? e => {
+						onClick(e);
+						this.onDownload(e, document.getElementById(id));
+					} : this.onDownload,
 				}, "Download"),
 			]),
-			t("img", {
-				"data-src": urls.small,
-				"data-alt": user.name,
-				load: this.onLoad,
-			}),
+			t("div", {
+				class: "splash--grid-image-img" + (
+					width && height && width > height ? "" : " tall"
+				)
+			}, [
+				t("img", {
+					...(isPreview ? {
+						src: urls.small,
+						alt: user.name,
+					} : {
+						"data-src": urls.small,
+						"data-alt": user.name,
+					}),
+					load: this.onLoad,
+					click: onClick,
+				}),
+				...(isPreview ? [t("img", {
+					src: urls.full,
+					alt: user.name,
+					click: onClick,
+				})] : []),
+			])
 		]);
 	}
 	

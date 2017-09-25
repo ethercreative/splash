@@ -145,6 +145,8 @@
 				width: 100%;
 				height: auto;
 				vertical-align: middle;
+
+				cursor: zoom-in;
 			}
 
 			&-top {
@@ -167,7 +169,12 @@
 				);
 
 				opacity: 0;
+				pointer-events: none;
 				transition: opacity 0.2s ease;
+
+				a {
+					pointer-events: all;
+				}
 
 				a:not(.dl) {
 					display: inline-block;
@@ -230,6 +237,69 @@
 			@keyframes loader {
 				from { background-position: 0 0 }
 				to { background-position: 200% 0 }
+			}
+		}
+	}
+
+	&--preview {
+		position: fixed;
+		z-index: 200;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+
+		transform: translate3d(0, 100%, 0);
+		transition: transform 0.5s ease;
+
+		user-select: none;
+
+		&.open {
+			transform: translate3d(0, 0, 0);
+		}
+
+		.splash--grid-image {
+			height: 100%;
+
+			&-top {
+				position: fixed;
+				opacity: 1;
+			}
+
+			&-img {
+				position: relative;
+				height: 100vh;
+				overflow: auto;
+
+				img {
+					position: relative;
+					left: 50%;
+
+					width: auto;
+					min-width: 100%;
+					min-height: 100%;
+
+					cursor: zoom-out;
+					transform: translate3d(-50%, 0, 0);
+
+					&:first-child {
+						position: absolute !important;
+						z-index: 0;
+						top: 0;
+					}
+
+					&:last-child {
+						z-index: 1;
+					}
+				}
+
+				&.tall img {
+					width: 100%;
+				}
+
+				&:not(.tall) img {
+					height: 100%;
+				}
 			}
 		}
 	}
