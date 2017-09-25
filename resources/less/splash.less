@@ -276,7 +276,6 @@
 
 					width: 100%;
 					height: auto;
-					min-height: 100%;
 
 					cursor: zoom-out;
 
@@ -288,6 +287,13 @@
 
 					&:last-child {
 						z-index: 1;
+					}
+				}
+
+				&.wide {
+					img {
+						height: 100%;
+						object-fit: cover;
 					}
 				}
 			}

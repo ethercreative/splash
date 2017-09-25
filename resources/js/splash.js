@@ -31,6 +31,9 @@ class Splash { // eslint-disable-line no-unused-vars
 	shortest = [];
 	watchers = [];
 	
+	preview = null;
+	previewHiRes = null;
+	
 	// Splash
 	// =========================================================================
 	
@@ -155,6 +158,10 @@ class Splash { // eslint-disable-line no-unused-vars
 		this.preview.classList.add("open");
 		document.body.style.overflow = "hidden";
 		document.body.parentNode.style.overflow = "hidden";
+		
+		setTimeout(() => {
+			this.previewHiRes.setAttribute("src", this.previewHiRes.dataset.src);
+		}, 500);
 	}
 	
 	// Events
@@ -300,7 +307,9 @@ class Splash { // eslint-disable-line no-unused-vars
 				}, "Download"),
 			]),
 			t("div", {
-				class: "splash--grid-image-img"
+				class: "splash--grid-image-img" + (
+					width && height && width > height ? " wide" : " tall"
+				)
 			}, [
 				t("img", {
 					...(isPreview ? {
@@ -314,9 +323,10 @@ class Splash { // eslint-disable-line no-unused-vars
 					click: onClick,
 				}),
 				...(isPreview ? [t("img", {
-					src: urls.full,
+					"data-src": urls.full,
 					alt: user.name,
 					click: onClick,
+					ref: el => { this.previewHiRes = el; }
 				})] : []),
 			])
 		]);
