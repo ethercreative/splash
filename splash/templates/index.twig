@@ -1,0 +1,32 @@
+{% extends '_layouts/cp' %}
+{% set title = "Splash!"|t %}
+
+{% block containerAttributes %}
+	class="splash--container"
+	id="container"
+{% endblock %}
+
+{% set extraPageHeaderHtml %}
+	<div class="texticon search icon clearable">
+		<form id="splashSearch">
+			<input class="text fullwidth" type="text" autofocus
+			       placeholder="Search Unsplash...">
+		</form>
+	</div>
+{% endset %}
+
+{% set mobile = craft.request.isMobileBrowser() %}
+{% set tablet = not mobile and craft.request.isMobileBrowser(true) %}
+
+{% block content %}
+	<div class="splash--grid{{ tablet ? " tablet" : mobile ? " mobile" }}"
+	     id="splashGrid">
+		{% set cols = tablet ? 2 : mobile ? 1 : 3 %}
+		{% for i in 1..cols %}
+			<div>
+				<div class="splash--grid-loader"></div>
+			</div>
+		{% endfor %}
+	</div>
+	<div id="splashMore"></div>
+{% endblock %}

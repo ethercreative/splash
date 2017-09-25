@@ -1,0 +1,118 @@
+{% import "_includes/forms" as forms %}
+
+{% if sources|length %}
+
+	{{ forms.selectField({
+		id:           "source",
+		name:         "source",
+		label:        "Upload Source",
+		instructions: "Where you want to upload the images to.",
+		first:        true,
+		required:     true,
+		value:        settings.source,
+		options:      sources,
+	}) }}
+
+	<hr>
+
+	{{ forms.selectField({
+		id:           "authorField",
+		name:         "authorField",
+		label:        "Image author field",
+		instructions: "Store the name of the images author to optionally credit them on your site.",
+		first:        true,
+		value:        settings.authorField,
+		options:      [],
+	}) }}
+
+	{{ forms.selectField({
+		id:           "authorUrlField",
+		name:         "authorUrlField",
+		label:        "Image author URL field",
+		instructions: "Store the URL of the image authors Unsplash profile.",
+		value:        settings.authorUrlField,
+		options:      [],
+	}) }}
+
+	{{ forms.selectField({
+		id:           "colorField",
+		name:         "colorField",
+		label:        "Image primary color field",
+		instructions: "Store the primary color of the image.",
+		value:        settings.colorField,
+		options:      [],
+	}) }}
+
+	<script>
+		function ns (name) {
+			return "settings-" + name;
+		}
+
+		const sources        = {{ sources|json_encode|raw }}
+			, source         = document.getElementById(ns("source"))
+			, authorField    = document.getElementById(ns("authorField"))
+			, authorUrlField = document.getElementById(ns("authorUrlField"))
+			, colorField     = document.getElementById(ns("colorField"));
+
+		function SplashSettings () {
+			source.addEventListener("change", SplashSettings.OnChange);
+			SplashSettings.OnChange();
+		}
+
+		SplashSettings.OnChange = function () {
+			for (let i = 0; i < sources.length; i++) {
+				if (sources[i].handle === source.value) {
+					SplashSettings.UpdateSelectedSource(sources[i]);
+					return;
+				}
+			}
+		};
+
+		SplashSettings.UpdateSelectedSource = function (source) {
+			while (authorField.firstElementChild)
+				authorField.removeChild(authorField.firstElementChild);
+
+			while (authorUrlField.firstElementChild)
+				authorUrlField.removeChild(authorUrlField.firstElementChild);
+
+			while (colorField.firstElementChild)
+				colorField.removeChild(colorField.firstElementChild);
+
+			const opt = document.createElement("option");
+			opt.setAttribute("value", "");
+			opt.textContent = "-----";
+
+			authorField.appendChild(opt);
+			authorUrlField.appendChild(opt);
+			colorField.appendChild(opt);
+
+			source.fields.forEach(function (field) {
+				const opt = document.createElement("option");
+				opt.setAttribute("value", field.value);
+				opt.textContent = field.label;
+
+				if (["PlainText", "RichText"].indexOf(field.type) > -1) {
+					authorField.appendChild(opt);
+					authorUrlField.appendChild(opt);
+				} else {
+					colorField.appendChild(opt);
+				}
+			});
+		};
+
+		SplashSettings();
+	</script>
+
+{% else %}
+	<div class="field first">
+		<div class="heading">
+			<label class="required">Upload Source</label>
+			<div class="instructions">
+				<p>Where you want to upload the images to.</p>
+			</div>
+		</div>
+		<div class="input ltr">
+			<p class="error">You haven't created any sources yet!</p>
+		</div>
+	</div>
+{% endif %}
