@@ -273,14 +273,12 @@
 
 				img {
 					position: relative;
-					left: 50%;
 
-					width: auto;
-					min-width: 100%;
+					width: 100%;
+					height: auto;
 					min-height: 100%;
 
 					cursor: zoom-out;
-					transform: translate3d(-50%, 0, 0);
 
 					&:first-child {
 						position: absolute !important;
@@ -291,14 +289,6 @@
 					&:last-child {
 						z-index: 1;
 					}
-				}
-
-				&.tall img {
-					width: 100%;
-				}
-
-				&:not(.tall) img {
-					height: 100%;
 				}
 			}
 		}

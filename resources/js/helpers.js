@@ -72,7 +72,8 @@ export function t (tag = "div", attributes = {}, children = []) {
 		if (!value) continue;
 		
 		if (typeof value === typeof (() => {})) {
-			elem.addEventListener(key, value);
+			if (key === "ref") value(elem);
+			else elem.addEventListener(key, value);
 			continue;
 		}
 		

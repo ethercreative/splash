@@ -300,9 +300,7 @@ class Splash { // eslint-disable-line no-unused-vars
 				}, "Download"),
 			]),
 			t("div", {
-				class: "splash--grid-image-img" + (
-					width && height && width > height ? "" : " tall"
-				)
+				class: "splash--grid-image-img"
 			}, [
 				t("img", {
 					...(isPreview ? {
