@@ -218,27 +218,6 @@
 				> div { opacity: 1 }
 			}
 		}
-
-		&-loader {
-			width: 100%;
-			padding-top: 75%;
-
-			background: #eee linear-gradient(
-				to right,
-				rgba(255, 255, 255, 0) 0%,
-				rgba(255, 255, 255, 0.9) 50%,
-				rgba(255, 255, 255, 0) 100%
-			) repeat-x;
-			background-size: 200% auto;
-			border-radius: 5px;
-
-			animation: loader 1s linear infinite;
-
-			@keyframes loader {
-				from { background-position: 0 0 }
-				to { background-position: 200% 0 }
-			}
-		}
 	}
 
 	&--preview {
@@ -297,6 +276,43 @@
 					}
 				}
 			}
+		}
+	}
+
+	&--more {
+		height: 60px;
+
+		background:
+				rgba(255,255,255,0.9)
+				url("/admin/resources/images/spinner_2x.gif")
+				center no-repeat;
+		background-size: 20px;
+
+		transition: opacity 0.2s ease;
+
+		&.hide {
+			opacity: 0;
+		}
+	}
+
+	&--empty {
+		position: absolute;
+		width: 100%;
+
+		padding: @spacer;
+
+		color: #ccc;
+		font-size: 16px;
+		font-weight: bold;
+		text-align: center;
+
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease;
+
+		&.show {
+			opacity: 1;
+			pointer-events: all;
 		}
 	}
 

@@ -12,6 +12,12 @@ const slowLoading = [
 	"{query} images coming right up...",
 ];
 
+const noResults = [
+	"We couldn't find anything for {query}",
+	"We looked, but couldn't find any {query} images",
+	"Are you sure {query} is a thing? We couldn't find it 😔",
+];
+
 class Splash { // eslint-disable-line no-unused-vars
 	
 	// Variables
@@ -19,6 +25,8 @@ class Splash { // eslint-disable-line no-unused-vars
 	
 	grid = null;
 	form = null;
+	more = null;
+	empty = null;
 	
 	io = null;
 	xhr = null;
@@ -40,9 +48,11 @@ class Splash { // eslint-disable-line no-unused-vars
 	constructor () {
 		this.grid = document.getElementById("splashGrid");
 		this.form = document.getElementById("splashSearch");
+		this.more = document.getElementById("splashMore");
+		this.empty = document.getElementById("splashEmpty");
 		
 		this.io = new IntersectionObserver(this.onObserve);
-		this.io.observe(document.getElementById("splashMore"));
+		this.io.observe(this.more);
 		
 		this.form.addEventListener("submit", e => e.preventDefault());
 		this.form.firstElementChild.addEventListener(
@@ -128,19 +138,22 @@ class Splash { // eslint-disable-line no-unused-vars
 			const si = this.shortest.indexOf(Math.min(...this.shortest));
 			this.shortest[si] += height;
 			
-			this.grid.children[si].insertBefore(
-				this.render(result),
-				this.grid.children[si].lastElementChild
+			this.grid.children[si].appendChild(
+				this.render(result)
 			);
 		});
 		
 		this.watchers.forEach(watcher => this.loadNextImage(watcher));
 		
-		if (this.page === this.totalPages)
-			for (let i = 0; i < this.grid.children.length; i++)
-				this.grid.children[i].removeChild(
-					this.grid.children[i].lastElementChild
-				);
+		if (this.page === this.totalPages || this.totalPages === 0)
+			this.more.classList.add("hide");
+		
+		if (this.totalPages === 0) {
+			this.empty.textContent =
+				noResults[Math.floor(Math.random() * noResults.length)]
+					.replace("{query}", this.search);
+			this.empty.classList.add("show");
+		}
 	}
 	
 	showPreview (image) {
@@ -239,8 +252,10 @@ class Splash { // eslint-disable-line no-unused-vars
 			}
 			
 			c[i].appendChild(this.watchers[i]);
-			c[i].appendChild(t("div", { class: "splash--grid-loader" }));
 		}
+		
+		this.more.classList.remove("hide");
+		this.empty.classList.remove("show");
 	}
 	
 	resetShortest () {
