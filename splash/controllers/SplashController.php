@@ -96,6 +96,7 @@ class SplashController extends BaseController {
 		$author = craft()->request->getRequiredPost("author");
 		$authorUrl = craft()->request->getRequiredPost("authorUrl");
 		$color = craft()->request->getRequiredPost("color");
+		$query = craft()->request->getRequiredPost("query");
 
 		$sourceId = $this->_settings["source"];
 		$authorField = $this->_settings["authorField"];
@@ -135,6 +136,8 @@ class SplashController extends BaseController {
 		}
 
 		$asset = craft()->assets->getFileById($asset->getDataItem('fileId'));
+
+		$asset->getContent()->title = $query . " " . $asset->title;
 
 		$content = [];
 

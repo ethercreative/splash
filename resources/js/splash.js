@@ -219,7 +219,8 @@ class Splash { // eslint-disable-line no-unused-vars
 		parent.classList.add("downloading");
 		
 		Craft.postActionRequest("splash/dl", {
-			id, image, author, authorUrl, color
+			id, image, author, authorUrl, color,
+			query: this.search,
 		}, (res, status) => {
 			parent.classList.remove("downloading");
 			
