@@ -193,7 +193,12 @@ class Splash { // eslint-disable-line no-unused-vars
 	
 	onObserve = entries => {
 		entries.forEach(entry => {
-			if (!entry.isIntersecting) return;
+			if (!entry.isIntersecting) {
+				if (entry.target.dataset.watcher
+				    && entry.boundingClientRect.top <= 0)
+					this.loadNextImage(entry.target);
+				return;
+			}
 			
 			if (entry.target.id === "splashMore") {
 				if (this.page !== this.totalPages && !this.isQuerying)
