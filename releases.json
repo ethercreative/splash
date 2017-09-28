@@ -6,5 +6,13 @@
     "notes": [
       "Pre-Release"
     ]
+  },
+  {
+    "version": "1.0.0",
+    "downloadUrl": "https://github.com/ethercreative/splash/archive/v1.0.0.zip",
+    "date": "2017-09-28T22:30:00-08:00",
+    "notes": [
+      "Initial Release"
+    ]
   }
 ]
