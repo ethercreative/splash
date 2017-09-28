@@ -329,7 +329,9 @@ class Splash { // eslint-disable-line no-unused-vars
 			]),
 			t("div", {
 				class: "splash--grid-image-img" + (
-					width && height && width > height ? " wide" : " tall"
+					(width && height && width > height)
+					|| window.innerHeight > window.innerWidth
+						? " wide" : " tall"
 				)
 			}, [
 				t("img", {
