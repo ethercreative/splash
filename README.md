@@ -25,6 +25,7 @@ Quickly and easily get beautiful Unsplash images in Craft!
 - [ ] Keep track of previously downloaded images
 - [ ] Integrate with additional free stock image services
 - [ ] Ability to like and collect images, mood boards?
+- [ ] Improve asset titles on download
 
 ## Changelog
 
