@@ -1,3 +1,5 @@
+![](resources/imgs/banner.jpg)
+
 # Splash!
 Quickly and easily get beautiful Unsplash images in Craft!
 
