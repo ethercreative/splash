@@ -7,17 +7,11 @@ Quickly and easily get beautiful Unsplash images in Craft!
 - Save the complementary colour of the image, as chosen by Unsplash
 - Stop clients uploading bad images ever again! (Just kidding, of course they will)
 
-![](resources/imgs/SplashPreview.gif)
-
-![](resources/imgs/SplashDownload.gif)
-
 ![](resources/imgs/SplashSearch.jpg)
 
 ![](resources/imgs/SplashPreview.jpg)
 
 ![](resources/imgs/SplashAsset.jpg)
-
-![](resources/imgs/SplashSettings.jpg)
 
 ## Upcoming Features
 
