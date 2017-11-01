@@ -1,16 +1,16 @@
 {% import "_includes/forms" as forms %}
 
-{% if sources|length %}
+{% if volumes|length %}
 
 	{{ forms.selectField({
-		id:           "source",
-		name:         "source",
-		label:        "Upload Source",
+		id:           "volume",
+		name:         "volume",
+		label:        "Upload Volume",
 		instructions: "Where you want to upload the images to.",
 		first:        true,
 		required:     true,
-		value:        settings.source,
-		options:      sources,
+		value:        settings.volume,
+		options:      volumes,
 	}) }}
 
 	<hr>
@@ -48,8 +48,8 @@
 			return "settings-" + name;
 		}
 
-		const sources        = {{ sources|json_encode|raw }}
-			, source         = document.getElementById(ns("source"))
+		const volumes        = {{ volumes|json_encode|raw }}
+			, volume         = document.getElementById(ns("volume"))
 			, authorField    = document.getElementById(ns("authorField"))
 			, authorUrlField = document.getElementById(ns("authorUrlField"))
 			, colorField     = document.getElementById(ns("colorField"));
@@ -59,20 +59,20 @@
 			, colorFieldValue     = "{{ settings.colorField }}";
 
 		function SplashSettings () {
-			source.addEventListener("change", SplashSettings.OnChange);
+			volume.addEventListener("change", SplashSettings.OnChange);
 			SplashSettings.OnChange();
 		}
 
 		SplashSettings.OnChange = function () {
-			for (let i = 0; i < sources.length; i++) {
-				if (sources[i].value === source.value) {
-					SplashSettings.UpdateSelectedSource(sources[i]);
+			for (let i = 0; i < volumes.length; i++) {
+				if (volumes[i].value === volume.value) {
+					SplashSettings.UpdateSelectedSource(volumes[i]);
 					return;
 				}
 			}
 		};
 
-		SplashSettings.UpdateSelectedSource = function (source) {
+		SplashSettings.UpdateSelectedSource = function (volume) {
 			while (authorField.firstElementChild)
 				authorField.removeChild(authorField.firstElementChild);
 
@@ -90,7 +90,7 @@
 			authorUrlField.appendChild(opt.cloneNode(true));
 			colorField.appendChild(opt.cloneNode(true));
 
-			source.fields.forEach(function (field) {
+			volume.fields.forEach(function (field) {
 				const opt = document.createElement("option");
 				opt.setAttribute("value", field.value);
 				opt.textContent = field.label;
@@ -114,13 +114,13 @@
 {% else %}
 	<div class="field first">
 		<div class="heading">
-			<label class="required">Upload Source</label>
+			<label class="required">Upload Volume</label>
 			<div class="instructions">
 				<p>Where you want to upload the images to.</p>
 			</div>
 		</div>
 		<div class="input ltr">
-			<p class="error">You haven't created any sources yet!</p>
+			<p class="error">You haven't created any volumes yet!</p>
 		</div>
 	</div>
 {% endif %}

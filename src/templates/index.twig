@@ -15,8 +15,8 @@
 	</div>
 {% endset %}
 
-{% set mobile = craft.request.isMobileBrowser() %}
-{% set tablet = not mobile and craft.request.isMobileBrowser(true) %}
+{% set mobile = craft.app.request.isMobileBrowser() %}
+{% set tablet = not mobile and craft.app.request.isMobileBrowser(true) %}
 
 {% block content %}
 	<div class="splash--grid{{ tablet ? " tablet" : mobile ? " mobile" }}"

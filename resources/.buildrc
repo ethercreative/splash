@@ -1,0 +1,22 @@
+{
+	"less": {
+		"ignore": false,
+		"input": "less/splash.less",
+		"output": "../src/resources/css",
+		"watch": [
+			"less/**/*"
+		]
+	},
+	"js": {
+		"ignore": false,
+		"input": "js/splash.js",
+		"output": "../src/resources/js/splash.min.js",
+		"watch": [
+			"js/**/*.js",
+			"!js/**/*.min.js"
+		]
+	},
+	"browserSync": {
+		"ignore": true
+	}
+}

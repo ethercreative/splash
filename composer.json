@@ -1,0 +1,25 @@
+{
+  "name": "ether/splash",
+  "license": "MIT",
+  "description": "Quickly and easily get beautiful Unsplash images in Craft!",
+  "version": "3.0.0",
+  "type": "craft-plugin",
+  "minimum-stability": "stable",
+  "require": {
+    "craftcms/cms": "^3.0.0-beta.20"
+  },
+  "autoload": {
+    "psr-4": {
+      "ether\\splash\\": "src/"
+    }
+  },
+  "support": {
+    "issues": "https://github.com/ethercreative/splash"
+  },
+  "extra": {
+    "handle": "splash",
+    "name": "Splash",
+    "developer": "Ether Creative",
+    "developerUrl": "https://ethercreative.com"
+  }
+}

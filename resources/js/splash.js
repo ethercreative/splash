@@ -83,7 +83,7 @@ class Splash { // eslint-disable-line no-unused-vars
 		this.xhr && this.xhr.cancel();
 		
 		this.xhr = new XMLHttpRequest();
-		this.xhr.open("POST", Craft.getActionUrl("splash/un"), true);
+		this.xhr.open("POST", "splash/un", true);
 		this.xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 		this.xhr.onload = () => {
 			const status = this.xhr.status;
@@ -250,7 +250,7 @@ class Splash { // eslint-disable-line no-unused-vars
 		for (let i = 0; i < c.length; i++) {
 			while (c[i].firstElementChild)
 				c[i].removeChild(c[i].firstElementChild);
-		
+			
 			if (!this.watchers[i]) {
 				this.watchers[i] = t("span");
 				this.watchers[i].dataset.watcher = true;
