@@ -223,13 +223,22 @@ class Splash { // eslint-disable-line no-unused-vars
 		
 		parent.classList.add("downloading");
 		
-		Craft.postActionRequest("splash/dl", {
-			id, image, author, authorUrl, color,
-			query: this.search,
-		}, (res, status) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "splash/dl", true);
+		xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+		xhr.onload = () => {
+			const status = xhr.status;
+			let res = xhr.responseText;
+			
+			try {
+				res = JSON.parse(res);
+			} catch (_) {
+				res = {};
+			}
+			
 			parent.classList.remove("downloading");
 			
-			if (status !== "success" || res.hasOwnProperty("error")) {
+			if (status < 200 || status >= 400) {
 				Craft.cp.displayError(
 					res.hasOwnProperty("error")
 						? res.error : "Failed to download image."
@@ -238,7 +247,18 @@ class Splash { // eslint-disable-line no-unused-vars
 			}
 			
 			Craft.cp.displayNotice("Image downloaded successfully!");
-		});
+		};
+		
+		const data = new FormData();
+		data.append(Craft.csrfTokenName, Craft.csrfTokenValue);
+		data.append("id", id);
+		data.append("image", image);
+		data.append("author", author);
+		data.append("authorUrl", authorUrl);
+		data.append("color", color);
+		data.append("query", this.search);
+		
+		xhr.send(data);
 	};
 	
 	// Helpers

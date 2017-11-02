@@ -3,9 +3,11 @@
 namespace ether\splash\controllers;
 
 use craft\elements\Asset;
+use craft\helpers\StringHelper;
 use craft\web\AssetManager;
+use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
-use ether\splash\Plugin;
+use ether\splash\Splash;
 use ether\splash\resources\SplashAssets;
 use function Sodium\crypto_aead_aes256gcm_decrypt;
 use yii\helpers\Json;
@@ -94,23 +96,24 @@ class SplashController extends Controller {
 
 		$id = $request->getRequiredBodyParam('id');
 		$image = $request->getRequiredBodyParam('image');
-		$author = $request->getRequiredBodyParam('author');
-		$authorUrl = $request->getRequiredBodyParam('authorUrl');
-		$color = $request->getRequiredBodyParam('color');
-		$query = $request->getRequiredBodyParam('query');
+		$author = $request->getBodyParam('author');
+		$authorUrl = $request->getBodyParam('authorUrl');
+		$color = $request->getBodyParam('color');
+		$query = $request->getBodyParam('query');
 
 		$volumeId = $this->_settings['volume'];
 		$authorField = $this->_settings['authorField'];
 		$authorUrlField = $this->_settings['authorUrlField'];
 		$colorField = $this->_settings['colorField'];
 
-		if (!$volumeId)
+		if (!$volumeId) {
 			return $this->asErrorJson(
 				'Missing Upload volume (see plugin settings).'
 			);
+		}
 
 		$folder = \Craft::$app->assets->getRootFolderByVolumeId($volumeId);
-		$fileName = $id . ".jpg";
+		$fileName = $id . '.jpg';
 		$tempPath = \Craft::$app->path->getTempPath();
 		$tempLocation = $tempPath . $fileName;
 
@@ -125,6 +128,9 @@ class SplashController extends Controller {
 		file_put_contents($tempLocation, $image);
 
 		$asset = new Asset();
+		$asset->title = StringHelper::toTitleCase(
+			$query . ' ' . pathinfo($fileName, PATHINFO_FILENAME)
+		);
 		$asset->tempFilePath = $tempLocation;
 		$asset->filename = $fileName;
 		$asset->newFolderId = $folder->id;
@@ -132,7 +138,21 @@ class SplashController extends Controller {
 		$asset->avoidFilenameConflicts = true;
 		$asset->setScenario(Asset::SCENARIO_CREATE);
 
+		$content = [];
+		if ($authorField) $content[$authorField] = $author;
+		if ($authorUrlField) $content[$authorUrlField] = $authorUrl;
+		if ($colorField) $content[$colorField] = $color;
+		$asset->setFieldValues($content);
+
 		$result = \Craft::$app->getElements()->saveElement($asset);
+
+		if ($result) {
+			return $this->asJson(['success' => true]);
+		} else {
+			return $this->asJson([
+				'errors' => $asset->getErrors(),
+			]);
+		}
 	}
 
 	// Helpers
@@ -140,7 +160,7 @@ class SplashController extends Controller {
 
 	private function getSettings ()
 	{
-		$this->_settings = Plugin::$i->getSettings();
+		$this->_settings = Splash::$i->getSettings();
 	}
 
 	private function removeTemp ($tempFile)

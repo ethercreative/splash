@@ -2,18 +2,23 @@
 
 namespace ether\splash;
 
+use Craft;
 use craft\base\FieldInterface;
 use craft\base\FlysystemVolume;
+use craft\base\Plugin;
+use craft\events\PluginEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
+use craft\services\Plugins;
 use craft\web\UrlManager;
 use ether\splash\models\Settings;
 use yii\base\Event;
 
-class Plugin extends \craft\base\Plugin {
+class Splash extends Plugin {
 
 	/**
-	 * @var Plugin
+	 * @var Splash
 	 */
 	public static $i;
 
@@ -33,11 +38,13 @@ class Plugin extends \craft\base\Plugin {
 		Event::on(
 			UrlManager::class,
 			UrlManager::EVENT_REGISTER_CP_URL_RULES,
-			function (RegisterUrlRulesEvent $event) {
-				$event->rules['splash'] = 'splash/splash/index';
-				$event->rules['POST splash/un'] = 'splash/splash/un';
-				$event->rules['POST splash/dl'] = 'splash/splash/dl';
-			}
+			[$this, 'onRegisterCPUrlRules']
+		);
+
+		Event::on(
+			Plugins::className(),
+			Plugins::EVENT_AFTER_INSTALL_PLUGIN,
+			[$this, 'onAfterInstallPlugin']
 		);
 	}
 
@@ -92,6 +99,26 @@ class Plugin extends \craft\base\Plugin {
 			'settings' => $this->getSettings(),
 			'volumes' => $volumes,
 		]);
+	}
+
+	// Events
+	// =========================================================================
+
+	public function onRegisterCPUrlRules (RegisterUrlRulesEvent $event)
+	{
+		$event->rules['splash'] = 'splash/splash/index';
+		$event->rules['POST splash/un'] = 'splash/splash/un';
+		$event->rules['POST splash/dl'] = 'splash/splash/dl';
+	}
+
+	public function onAfterInstallPlugin (PluginEvent $event)
+	{
+		if (!Craft::$app->getRequest()->getIsConsoleRequest()
+		    && ($event->plugin === $this)) {
+			Craft::$app->getResponse()->redirect(
+				UrlHelper::cpUrl('settings/plugins/splash')
+			)->send();
+		}
 	}
 
 }

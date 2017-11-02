@@ -45,14 +45,14 @@
 
 	<script>
 		function ns (name) {
-			return "settings-" + name;
+			return "settings-" + name + "-field";
 		}
 
 		const volumes        = {{ volumes|json_encode|raw }}
-			, volume         = document.getElementById(ns("volume"))
-			, authorField    = document.getElementById(ns("authorField"))
-			, authorUrlField = document.getElementById(ns("authorUrlField"))
-			, colorField     = document.getElementById(ns("colorField"));
+			, volume         = document.getElementById(ns("volume")).querySelector("select")
+			, authorField    = document.getElementById(ns("authorField")).querySelector("select")
+			, authorUrlField = document.getElementById(ns("authorUrlField")).querySelector("select")
+			, colorField     = document.getElementById(ns("colorField")).querySelector("select");
 
 		const authorFieldValue    = "{{ settings.authorField }}"
 			, authorUrlFieldValue = "{{ settings.authorUrlField }}"
@@ -65,7 +65,7 @@
 
 		SplashSettings.OnChange = function () {
 			for (let i = 0; i < volumes.length; i++) {
-				if (volumes[i].value === volume.value) {
+				if (volumes[i].value === +volume.value) {
 					SplashSettings.UpdateSelectedSource(volumes[i]);
 					return;
 				}
