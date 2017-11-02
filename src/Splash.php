@@ -26,6 +26,9 @@ class Splash extends Plugin {
 	public $hasCpSection  = true;
 	public $hasCpSettings = true;
 
+	public $changelogUrl = 'https://raw.githubusercontent.com/ethercreative/splash/v3/CHANGELOG.md';
+	public $downloadUrl = 'https://github.com/ethercreative/splash/archive/v3.zip';
+
 	/**
 	 * Initialize
 	 */
