@@ -3,6 +3,8 @@
 # Splash!
 Quickly and easily get beautiful Unsplash images in Craft!
 
+[Click here for the **Craft 3** version.](https://github.com/ethercreative/splash/tree/v3)
+
 ### Features
 - Quick and easy search & preview
 - Store the images author and a link to their Unsplash profile
