@@ -6,14 +6,14 @@
 	id="container"
 {% endblock %}
 
-{% set extraPageHeaderHtml %}
+{% block actionButton %}
 	<div class="texticon search icon clearable">
 		<form id="splashSearch">
 			<input class="text fullwidth" type="text" autofocus
 			       placeholder="Search Unsplash...">
 		</form>
 	</div>
-{% endset %}
+{% endblock %}
 
 {% set mobile = craft.app.request.isMobileBrowser() %}
 {% set tablet = not mobile and craft.app.request.isMobileBrowser(true) %}

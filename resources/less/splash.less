@@ -1,11 +1,11 @@
 @spacer: 24px;
 
-.splash {
+#header {
+	.flex-grow { display: none }
+	.search { flex-grow: 1; margin-left: @spacer }
+}
 
-	&--container {
-		#page-title { flex-grow: 0 !important }
-		#extra-headers { flex-grow: 1; margin-left: @spacer }
-	}
+.splash {
 
 	&--grid {
 		position: relative;
