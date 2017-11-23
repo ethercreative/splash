@@ -282,6 +282,7 @@ class Splash { // eslint-disable-line no-unused-vars
 		
 		this.more.classList.remove("hide");
 		this.empty.classList.remove("show");
+		window.scrollTo(0, 0);
 	}
 	
 	resetShortest () {
