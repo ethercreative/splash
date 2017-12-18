@@ -4,12 +4,9 @@ namespace ether\splash\controllers;
 
 use craft\elements\Asset;
 use craft\helpers\StringHelper;
-use craft\web\AssetManager;
-use craft\web\assets\cp\CpAsset;
 use craft\web\Controller;
 use ether\splash\Splash;
 use ether\splash\resources\SplashAssets;
-use function Sodium\crypto_aead_aes256gcm_decrypt;
 use yii\helpers\Json;
 
 class SplashController extends Controller {
