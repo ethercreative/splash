@@ -65,7 +65,7 @@
 
 		SplashSettings.OnChange = function () {
 			for (let i = 0; i < volumes.length; i++) {
-				if (volumes[i].value === +volume.value) {
+				if (volumes[i].value === volume.value) {
 					SplashSettings.UpdateSelectedSource(volumes[i]);
 					return;
 				}
