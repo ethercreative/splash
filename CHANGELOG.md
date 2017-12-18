@@ -1,3 +1,7 @@
+## 3.0.2 - 2017-12-18
+### Fixed
+- Fixed settings not showing fields in some instances
+
 ## 3.0.1 - 2017-11-29
 ### Fixed
 - Fixed the nav icon being broken after a composer install
