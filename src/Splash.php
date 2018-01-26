@@ -43,12 +43,6 @@ class Splash extends Plugin {
 			UrlManager::EVENT_REGISTER_CP_URL_RULES,
 			[$this, 'onRegisterCPUrlRules']
 		);
-
-		Event::on(
-			Plugins::className(),
-			Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-			[$this, 'onAfterInstallPlugin']
-		);
 	}
 
 	/**
@@ -104,6 +98,18 @@ class Splash extends Plugin {
 		]);
 	}
 
+	public function afterInstall ()
+	{
+		parent::afterInstall();
+
+		if (Craft::$app->getRequest()->getIsConsoleRequest())
+			return;
+
+		Craft::$app->getResponse()->redirect(
+			UrlHelper::cpUrl('settings/plugins/splash')
+		)->send();
+	}
+
 	// Events
 	// =========================================================================
 
@@ -112,16 +118,6 @@ class Splash extends Plugin {
 		$event->rules['splash'] = 'splash/splash/index';
 		$event->rules['POST splash/un'] = 'splash/splash/un';
 		$event->rules['POST splash/dl'] = 'splash/splash/dl';
-	}
-
-	public function onAfterInstallPlugin (PluginEvent $event)
-	{
-		if (!Craft::$app->getRequest()->getIsConsoleRequest()
-		    && ($event->plugin === $this)) {
-			Craft::$app->getResponse()->redirect(
-				UrlHelper::cpUrl('settings/plugins/splash')
-			)->send();
-		}
 	}
 
 }
