@@ -1,6 +1,9 @@
-## [Unreleased] 3.0.3
+## 3.0.3 - 2019-04-03
 ### Fixed
 - Fixed error when volume field layout ID is null (#8)
+
+### Improved
+- Updated icons
 
 ## 3.0.2 - 2017-12-18
 ### Fixed
