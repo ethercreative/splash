@@ -1,3 +1,7 @@
+## [Unreleased] 3.0.3
+### Fixed
+- Fixed error when volume field layout ID is null (#8)
+
 ## 3.0.2 - 2017-12-18
 ### Fixed
 - Fixed settings not showing fields in some instances
