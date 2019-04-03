@@ -6,13 +6,14 @@ use Craft;
 use craft\base\FieldInterface;
 use craft\base\FlysystemVolume;
 use craft\base\Plugin;
-use craft\events\PluginEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
-use craft\services\Plugins;
 use craft\web\UrlManager;
 use ether\splash\models\Settings;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Event;
 
 class Splash extends Plugin {
@@ -43,12 +44,6 @@ class Splash extends Plugin {
 			UrlManager::EVENT_REGISTER_CP_URL_RULES,
 			[$this, 'onRegisterCPUrlRules']
 		);
-
-		Event::on(
-			Plugins::className(),
-			Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-			[$this, 'onAfterInstallPlugin']
-		);
 	}
 
 	/**
@@ -59,6 +54,12 @@ class Splash extends Plugin {
 		return new Settings();
 	}
 
+	/**
+	 * @return string
+	 * @throws LoaderError
+	 * @throws RuntimeError
+	 * @throws SyntaxError
+	 */
 	protected function settingsHtml () : string
 	{
 		// Get and pre-validate the settings
@@ -75,21 +76,25 @@ class Splash extends Plugin {
 
 			$fields = [];
 
-			/** @var FieldLayout $layout */
-			$layout = \Craft::$app->fields->getLayoutById($volume->fieldLayoutId);
-
-			/** @var FieldInterface $field */
-			foreach ($layout->getFields() as $field)
+			if ($volume->fieldLayoutId !== null)
 			{
-				$fieldTypeClass = explode('\\', get_class($field));
-				$fieldTypeClass = end($fieldTypeClass);
-				if (in_array($fieldTypeClass, $validFields))
+				/** @var FieldLayout $layout */
+				$layout =
+					\Craft::$app->fields->getLayoutById($volume->fieldLayoutId);
+
+				/** @var FieldInterface $field */
+				foreach ($layout->getFields() as $field)
 				{
-					$fields[] = [
-						"label" => $field->name,
-						"value" => $field->handle,
-						"type"  => $fieldTypeClass,
-					];
+					$fieldTypeClass = explode('\\', get_class($field));
+					$fieldTypeClass = end($fieldTypeClass);
+					if (in_array($fieldTypeClass, $validFields))
+					{
+						$fields[] = [
+							"label" => $field->name,
+							"value" => $field->handle,
+							"type"  => $fieldTypeClass,
+						];
+					}
 				}
 			}
 
@@ -104,6 +109,18 @@ class Splash extends Plugin {
 		]);
 	}
 
+	public function afterInstall ()
+	{
+		parent::afterInstall();
+
+		if (Craft::$app->getRequest()->getIsConsoleRequest())
+			return;
+
+		Craft::$app->getResponse()->redirect(
+			UrlHelper::cpUrl('settings/plugins/splash')
+		)->send();
+	}
+
 	// Events
 	// =========================================================================
 
@@ -112,16 +129,6 @@ class Splash extends Plugin {
 		$event->rules['splash'] = 'splash/splash/index';
 		$event->rules['POST splash/un'] = 'splash/splash/un';
 		$event->rules['POST splash/dl'] = 'splash/splash/dl';
-	}
-
-	public function onAfterInstallPlugin (PluginEvent $event)
-	{
-		if (!Craft::$app->getRequest()->getIsConsoleRequest()
-		    && ($event->plugin === $this)) {
-			Craft::$app->getResponse()->redirect(
-				UrlHelper::cpUrl('settings/plugins/splash')
-			)->send();
-		}
 	}
 
 }
