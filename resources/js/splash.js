@@ -335,10 +335,10 @@ class Splash { // eslint-disable-line no-unused-vars
 				t("a", {
 					id: (isPreview ? "" : id),
 					class: "dl",
-					href: links.download + refer,
+					href: links.download_location + refer,
 					target: "_blank",
 					"data-id": id,
-					"data-image": links.download,
+					"data-image": links.download_location,
 					"data-author": user.name,
 					"data-author-url": user.links.html,
 					"data-color": color,
@@ -377,3 +377,5 @@ class Splash { // eslint-disable-line no-unused-vars
 	}
 	
 }
+
+window.Splash = Splash;

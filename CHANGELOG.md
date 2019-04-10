@@ -1,3 +1,8 @@
+## 3.0.4 - 2019-04-10
+### Fixed
+- Use correct Unsplash download url
+- Fixed only first page loading
+
 ## 3.0.3 - 2019-04-03
 ### Fixed
 - Fixed error when volume field layout ID is null (#8)

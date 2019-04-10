@@ -2,12 +2,19 @@
 
 namespace ether\splash\controllers;
 
+use Craft;
 use craft\elements\Asset;
+use craft\errors\ElementNotFoundException;
+use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use ether\splash\Splash;
 use ether\splash\resources\SplashAssets;
-use yii\helpers\Json;
+use Throwable;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 class SplashController extends Controller {
 
@@ -19,6 +26,9 @@ class SplashController extends Controller {
 	// Actions
 	// =========================================================================
 
+	/**
+	 * @throws InvalidConfigException
+	 */
 	public function actionIndex ()
 	{
 		$this->view->registerAssetBundle(SplashAssets::class);
@@ -26,9 +36,13 @@ class SplashController extends Controller {
 		$this->renderTemplate('splash/index');
 	}
 
+	/**
+	 * @return Response
+	 * @throws BadRequestHttpException
+	 */
 	public function actionUn ()
 	{
-		$request = \Craft::$app->request;
+		$request = Craft::$app->request;
 		$page = $request->getRequiredBodyParam('page');
 		$query = mb_strtolower($request->getBodyParam('query', ''));
 		$per_page = 30;
@@ -41,7 +55,7 @@ class SplashController extends Controller {
 
 		$cacheName = 'splash!' . $page . preg_replace('/\s+/', '', $query);
 
-		if ($r = \Craft::$app->cache->get($cacheName))
+		if ($r = Craft::$app->cache->get($cacheName))
 			return $this->asJson($r);
 
 		$ch = curl_init();
@@ -64,8 +78,8 @@ class SplashController extends Controller {
 		$headers = explode("\n", $headers);
 		$total = 0;
 		foreach($headers as $header) {
-			if (stripos($header, 'X-Total:') !== false) {
-				$total = (int) str_replace("X-Total: ", "", $header);
+			if (stripos($header, 'x-total:') !== false) {
+				$total = (int) str_replace("x-total: ", "", $header);
 				break;
 			}
 		}
@@ -77,19 +91,26 @@ class SplashController extends Controller {
 		}
 
 		if ($images == null) {
-			\Craft::info("https://api.unsplash.com/$endPoint?$params", 'Splash');
-			\Craft::info(print_r($response, true), 'Splash');
+			Craft::info("https://api.unsplash.com/$endPoint?$params", 'Splash');
+			Craft::info(print_r($response, true), 'Splash');
 		}
 
 		$r = compact("images", "totalPages");
-		if (count($images)) \Craft::$app->cache->set($cacheName, $r);
+		if (count($images)) Craft::$app->cache->set($cacheName, $r);
 		return $this->asJson($r);
 	}
 
+	/**
+	 * @return Response
+	 * @throws BadRequestHttpException
+	 * @throws Throwable
+	 * @throws ElementNotFoundException
+	 * @throws Exception
+	 */
 	public function actionDl ()
 	{
 		$this->getSettings();
-		$request = \Craft::$app->request;
+		$request = Craft::$app->request;
 
 		$id = $request->getRequiredBodyParam('id');
 		$image = $request->getRequiredBodyParam('image');
@@ -103,19 +124,33 @@ class SplashController extends Controller {
 		$authorUrlField = $this->_settings['authorUrlField'];
 		$colorField = $this->_settings['colorField'];
 
+		$clientId = 'a0c361d345497721f4a72ec4f8582ce0ab5c8328aed22b80f77aef3dc467180c';
+
 		if (!$volumeId) {
 			return $this->asErrorJson(
 				'Missing Upload volume (see plugin settings).'
 			);
 		}
 
-		$folder = \Craft::$app->assets->getRootFolderByVolumeId($volumeId);
+		$folder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
 		$fileName = $id . '.jpg';
-		$tempPath = \Craft::$app->path->getTempPath();
+		$tempPath = Craft::$app->path->getTempPath();
 		$tempLocation = $tempPath . $fileName;
 
+		// Get the image url
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $image);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, [
+			"Accept-Version: v1",
+			"Authorization: Client-ID " . $clientId,
+		]);
+		$imageUrl = Json::decodeIfJson(curl_exec($ch))['url'];
+		curl_close($ch);
+
+		// Download the image
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $imageUrl);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -141,7 +176,7 @@ class SplashController extends Controller {
 		if ($colorField) $content[$colorField] = $color;
 		$asset->setFieldValues($content);
 
-		$result = \Craft::$app->getElements()->saveElement($asset);
+		$result = Craft::$app->getElements()->saveElement($asset);
 
 		if ($result) {
 			return $this->asJson(['success' => true]);
@@ -158,12 +193,6 @@ class SplashController extends Controller {
 	private function getSettings ()
 	{
 		$this->_settings = Splash::$i->getSettings();
-	}
-
-	private function removeTemp ($tempFile)
-	{
-		if (file_exists($tempFile))
-			unlink($tempFile);
 	}
 
 }

@@ -1,11 +1,12 @@
 {
   "name": "ether/splash",
   "description": "Quickly and easily get beautiful Unsplash images in Craft!",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "type": "craft-plugin",
   "minimum-stability": "dev",
   "require": {
-    "craftcms/cms": "^3.0.0-RC1"
+    "craftcms/cms": "^3.0.0-RC1",
+    "ext-curl": "*"
   },
   "autoload": {
     "psr-4": {
