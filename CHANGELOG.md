@@ -1,3 +1,10 @@
+## 3.0.5 - 2019-04-16
+### Added
+- Added "Powered by Unsplash" to the settings page to appease our Unsplash overlords.
+
+### Fixed
+- Fixed only first page loading, for real this time.
+
 ## 3.0.4 - 2019-04-10
 ### Fixed
 - Use correct Unsplash download url
