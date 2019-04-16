@@ -78,8 +78,10 @@ class SplashController extends Controller {
 		$headers = explode("\n", $headers);
 		$total = 0;
 		foreach($headers as $header) {
-			if (stripos($header, 'x-total:') !== false) {
-				$total = (int) str_replace("x-total: ", "", $header);
+			@list($header, $value) = explode(':', $header);
+
+			if (stripos(strtolower($header), 'x-total') !== false) {
+				$total = (int) trim($value);
 				break;
 			}
 		}
