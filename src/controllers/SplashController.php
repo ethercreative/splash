@@ -137,7 +137,7 @@ class SplashController extends Controller {
 		$folder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
 		$fileName = $id . '.jpg';
 		$tempPath = Craft::$app->path->getTempPath();
-		$tempLocation = $tempPath . $fileName;
+		$tempLocation = $tempPath . '/' . $fileName;
 
 		// Get the image url
 		$ch = curl_init();
